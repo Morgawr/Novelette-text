@@ -2,8 +2,8 @@
 
 Novelette-text is a simple ClojureScript library inspired by [CanvasText](http://canvastext.com/) to provide a simple and fast collection of functions to render text on an HTML5 canvas with different styles.
 
-Font rendering on HTML5 canvas can be very tricky, proper font wrapping and different styling can be a performance issues especially in 2D videogames.
-This library tries to make the developer's life easier by providing simple functions for such common tasks. 
+Font rendering on HTML5 canvas can be very tricky, proper font wrapping and different styling can give performance issues especially in 2D videogames.
+This library tries to make the developer's life easier by providing simple and efficient functions for such common tasks. 
 It is especially aimed for HTML5 game development on canvas.
 
 ## Usage
@@ -18,7 +18,7 @@ Import the namespace to your project:
   (:require [novelette-text.renderer]))
 ```
 
-Initialize the renderer by providing your canvas' surface elementId:
+Initialize the renderer by providing your canvas surface elementId:
 ```clojure
 (let [renderer (novelette-text.renderer/create-renderer "surface")]
   ; ... Do your rendering here!
@@ -60,7 +60,7 @@ Those two calls are identical as those are the given default font values in the 
 This will print "Hello World!" starting at coordinates (100, 100) on the canvas and will auto-wrap at 500 width.
 If you plan to render the same text very often (like in a game loop), you can provide an ID to cache the render call and make successive calls much faster:
 ```clojure
-(novelette-text.renderer/draw-text "Cached Hello World! [100 100] 500 font-class :my-cache-id true renderer) 
+(novelette-text.renderer/draw-text "Cached Hello World!" [100 100] 500 font-class :my-cache-id true renderer) 
 ```
 
 Once you're done you can empty the cache:
