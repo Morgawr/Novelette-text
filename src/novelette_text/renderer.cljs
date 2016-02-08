@@ -110,6 +110,8 @@
    {:keys [context
            buffer-context
            buffer-canvas] :as renderer}:- Renderer]
+  (.clearRect ; We clear the dirty data from previous drawings
+    buffer-context 0 0 (.-width buffer-canvas) (.-height buffer-canvas))
   (let [matches (.match text outer-tag-match)
         font-class (atom class)  ; These are stateful definitions because it
         curr-pos (atom position) ; looks better if we add a bit of contained
