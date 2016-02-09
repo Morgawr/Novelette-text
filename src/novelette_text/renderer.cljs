@@ -143,8 +143,9 @@
                                          (:font-family @font-class) " "))
       (set! (.-fillStyle buffer-context) (:color @font-class))
       (when (:text-shadow @font-class)
-        (let [shadow (map #(string/replace % #"px" "")
-                          (string/split (:text-shadow @font-class) #" "))]
+        (let [shadow
+              (into [] (map #(string/replace % #"px" "")
+                            (string/split (:text-shadow @font-class) #" ")))]
           (set! (.-shadowOffsetX buffer-context) (shadow 0))
           (set! (.-shadowOffsetY buffer-context) (shadow 1))
           (set! (.-shadowBlur buffer-context) (shadow 2))
@@ -241,8 +242,9 @@
                                              (:font-family font-class) " "))
           (set! (.-fillStyle buffer-context) (:color font-class))
           (when (:text-shadow font-class)
-            (let [shadow (map #(string/replace % #"px" "")
-                              (string/split (:text-shadow font-class) #" "))]
+            (let [shadow
+                  (into [] (map #(string/replace % #"px" "")
+                                (string/split (:text-shadow font-class) #" ")))]
               (set! (.-shadowOffsetX buffer-context) (shadow 0))
               (set! (.-shadowOffsetY buffer-context) (shadow 1))
               (set! (.-shadowBlur buffer-context) (shadow 2))
