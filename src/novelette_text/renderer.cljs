@@ -4,8 +4,8 @@
             [schema.core :as s]
             [goog.dom :as dom]))
 
-(def outer-tag-match (js/RegExp. "<\\s*br\\s*\\/>|<\\s*style=[\"|']([^\"|']+)[\"|']\\s*\\>([^>]+)<\\s*\\/style\\s*\\>|[^<]+" "g"))
-(def inner-tag-match (js/RegExp. "<\\s*style=[\"|']([^\"|']+)[\"|']\\s*\\>([^>]+)<\\s*\\/style\\s*\\>"))
+(def outer-tag-match (js/RegExp. "<\\s*br\\s*\\/>|<\\s*style=[\"|']([^\"|']+)[\"|']\\s*\\>([^>]*)<\\s*\\/style\\s*\\>|[^<]*" "g"))
+(def inner-tag-match (js/RegExp. "<\\s*style=[\"|']([^\"|']+)[\"|']\\s*\\>([^>]*)<\\s*\\/style\\s*\\>"))
 
 (s/defrecord Cache
   [canvas :- js/HTMLCanvasElement
