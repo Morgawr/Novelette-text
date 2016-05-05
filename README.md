@@ -58,6 +58,7 @@ Those two calls are identical as those are the given default font values in the 
 ```
 
 This will print "Hello World!" starting at coordinates (100, 100) on the canvas and will auto-wrap at 500 width.
+It will also return the positon of the bottom-right-most corner in the just-rendered string of text, making it easier for you to add extra graphics (like a cursor for example) or extra text right after.
 If you plan to render the same text very often (like in a game loop), you can provide an ID to cache the render call and make successive calls much faster:
 ```clojure
 (novelette-text.renderer/draw-text "Cached Hello World!" [100 100] 500 font-class :my-cache-id true renderer) 

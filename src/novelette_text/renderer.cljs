@@ -9,7 +9,9 @@
 
 (s/defrecord Cache
   [canvas :- js/HTMLCanvasElement
-   context :- js/CanvasRenderingContext2D])
+   context :- js/CanvasRenderingContext2D
+   return-position :- s/Any ; This is a [int int] (x, y)
+   ])
 
 (s/defrecord Renderer
   [canvas :- js/HTMLCanvasElement
@@ -65,14 +67,15 @@
 (s/defn cache!
   "Cache the given ID in the renderer by drawing the buffer into the cache."
   [id :- s/Keyword
-   renderer :- Renderer]
+   renderer :- Renderer
+   return-position :- s/Any]
   (let [document (dom/getDocument)
         canvas (.createElement document "canvas")
         ctx (.getContext canvas "2d")]
     (set! (.-width canvas) (.-width (:buffer-canvas renderer)))
     (set! (.-height canvas) (.-height (:buffer-canvas renderer)))
     (.drawImage ctx (:buffer-canvas renderer) 0 0)
-    (swap! (:cache-map renderer) assoc id (Cache. canvas ctx))))
+    (swap! (:cache-map renderer) assoc id (Cache. canvas ctx return-position))))
 
 (s/defn get-cached
   "Return the cached canvas."
@@ -117,7 +120,8 @@
         curr-pos (atom position) ; looks better if we add a bit of contained
         to-print (atom "")       ; state in this case ;_; sorry
         groups (atom [])
-        token-counter (atom 0)]
+        token-counter (atom 0)
+        return-position (atom [0 0])]
     (doseq [m matches]
       (reset! font-class class)
       (reset! to-print "")
@@ -249,12 +253,22 @@
               (set! (.-shadowOffsetY buffer-context) (shadow 1))
               (set! (.-shadowBlur buffer-context) (shadow 2))
               (set! (.-shadowColor buffer-context) (shadow 3))))
+          ; Here we calculate the coordinates for the bottom-right corner of
+          ; the text we are rendering so we can return a position in case
+          ; somebody needs to perform some operations right after drawing
+          ; some text to screen.
+          (when-not (= (second @return-position) (second position))
+            (reset! return-position [(first position) (second position)]))
+          (swap! return-position update-in [0]
+                 + (.-width (.measureText buffer-context text)))
           (.fillText buffer-context text (first position) (second position)))
         (.restore buffer-context)))
-    (.drawImage context buffer-canvas 0 0)))
+    (.drawImage context buffer-canvas 0 0)
+    @return-position))
 
 (s/defn draw-text
-  "Draw the given text in the canvas and possibly cache it."
+  "Draw the given text in the canvas and possibly cache it, then return the
+  coordinates of the right-most/bottom-most position of the rendered text."
   ([text :- s/Str
     position :- [(s/one s/Int :x) (s/one s/Int :y)]
     max-width :- s/Int
@@ -268,8 +282,13 @@
     id :- s/Keyword
     cached? :- s/Bool
     {:keys [context] :as renderer}:- Renderer]
-   (if (and cached? (is-cached? id renderer))
-     (.drawImage context (:canvas (get-cached id renderer)) 0 0)
-     (draw-styled-text text position max-width class renderer))
-   (when (and cached? (not (is-cached? id renderer)))
-     (cache! id renderer))))
+   (let [return-pos (atom [])]
+     (if (and cached? (is-cached? id renderer))
+       (do
+         (.drawImage context (:canvas (get-cached id renderer)) 0 0)
+         (reset! return-pos (:return-position (get-cached id renderer))))
+       (reset! return-pos
+               (draw-styled-text text position max-width class renderer)))
+     (when (and cached? (not (is-cached? id renderer)))
+       (cache! id renderer @return-pos))
+     @return-pos)))
