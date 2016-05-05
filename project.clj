@@ -1,4 +1,4 @@
-(defproject novelette-text "0.1.2-SNAPSHOT"
+(defproject novelette-text "0.1.3"
   :description "Clojurescript library for flexible text rendering on canvas."
   :license "MIT License"
   :url "https://github.com/Morgawr/Novelette-text"
