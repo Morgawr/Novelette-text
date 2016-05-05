@@ -104,6 +104,13 @@
   [context :- js/CanvasRenderingContext2D]
   (Math/floor (.-width (.measureText context "M"))))
 
+(s/defn replace-angle-brackets
+  "Replace occurrences of &gt; and &lt; with > and < respectively."
+  [text :- s/Str]
+  (-> text
+      (clojure.string/replace #"&gt;" ">")
+      (clojure.string/replace #"&lt;" "<")))
+
 (s/defn draw-styled-text
   "Draw the given text in the canvas and render any given style tags."
   [text :- s/Str
@@ -133,11 +140,11 @@
               prop-list (map #(string/split % #":") (string/split p #";"))]
           (doseq [[k v] prop-list]
             (swap! font-class assoc (keyword k) v))
-          (reset! to-print mm))
+          (reset! to-print (replace-angle-brackets mm)))
         (.test (js/RegExp. "<\\s*br\\s*" "i") m)
         (swap! groups conj {:new-line true})
         :else
-        (reset! to-print m))
+        (reset! to-print (replace-angle-brackets m)))
       ; We need to intantiate the context so we can properly measure strings
       (set! (.-textBaseline buffer-context) (:text-baseline @font-class))
       (set! (.-textAlign buffer-context) (:text-align @font-class))
